@@ -1,0 +1,223 @@
+@model WebShop.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-dark">Admin Dashboard</h1>
+</div>
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Number of Admins</div>
+                        <div class="h5 mb-0 font-weight-bold text-dark">@Model.NumberOfAdmins</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-person-shield fs-1 text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Number of Customers</div>
+                        <div class="h5 mb-0 font-weight-bold text-dark">@Model.NumberOfCustomers</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-people fs-1 text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Products</div>
+                        <div class="h5 mb-0 font-weight-bold text-dark">@Model.TotalProducts</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-box-seam fs-1 text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Orders This Month</div>
+                        <div class="h5 mb-0 font-weight-bold text-dark">@Model.OrdersThisMonth</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-cart-check fs-1 text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-4 col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Category Distribution</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="categoryPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Monthly Revenue</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueLineChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">New Customers</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="newCustomersBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const categoryPieChart = new Chart(document.getElementById('categoryPieChart'), {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.CategoryDistribution.Keys)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.CategoryDistribution.Values)),
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const revenueLineChart = new Chart(document.getElementById('revenueLineChart'), {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.MonthlyRevenue.Keys)),
+                datasets: [{
+                    label: 'Revenue',
+                    data: @Html.Raw(Json.Serialize(Model.MonthlyRevenue.Values)),
+                    backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                    borderColor: '#36A2EB',
+                    pointBackgroundColor: '#36A2EB',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#36A2EB',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const newCustomersBarChart = new Chart(document.getElementById('newCustomersBarChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.NewCustomersByMonth.Keys)),
+                datasets: [{
+                    label: 'New Customers',
+                    data: @Html.Raw(Json.Serialize(Model.NewCustomersByMonth.Values)),
+                    backgroundColor: '#FF6384',
+                    borderColor: '#FF6384',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

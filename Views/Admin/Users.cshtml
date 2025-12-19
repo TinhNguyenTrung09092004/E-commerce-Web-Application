@@ -1,0 +1,44 @@
+@model IEnumerable<WebShop.Models.ApplicationUser>
+@{
+    ViewData["Title"] = "Manage Users";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Manage Users</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td><a asp-action="UserDetails" asp-route-id="@user.Id">@user.FullName</a></td>
+                <td>@user.Email</td>
+                <td>@(user.LockoutEnd == null || user.LockoutEnd < DateTimeOffset.Now ? "Active" : "Locked")</td>
+                <td>
+                    @if (user.Id != User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                    {
+                        @if (user.LockoutEnd == null || user.LockoutEnd < DateTimeOffset.Now)
+                        {
+                            <form asp-action="LockUser" asp-route-id="@user.Id" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to lock this user?')">Lock</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="UnlockUser" asp-route-id="@user.Id" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to unlock this user?')">Unlock</button>
+                            </form>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,223 @@
+@model X.PagedList.IPagedList<WebShop.Models.Product>
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@{
+    ViewData["Title"] = "Products";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var viewMode = ViewBag.ViewMode ?? "grid";
+}
+
+<h2 class="section-title">Products</h2>
+
+<div class="search-filter mb-4">
+    <form asp-action="Products" method="get" class="row g-3 align-items-end">
+        <div class="col-md-2">
+            <label for="minPrice" class="form-label">Min Price</label>
+            <input type="number" name="minPrice" class="form-control" value="@ViewBag.MinPrice" placeholder="Min price" min="0" step="0.01" />
+        </div>
+        <div class="col-md-2">
+            <label for="maxPrice" class="form-label">Max Price</label>
+            <input type="number" name="maxPrice" class="form-control" value="@ViewBag.MaxPrice" placeholder="Max price" min="0" step="0.01" />
+        </div>
+        <div class="col-md-2">
+            <label for="viewMode" class="form-label">View Mode</label>
+            <select name="viewMode" class="form-control" onchange="this.form.submit()">
+                <option value="grid" selected="@(viewMode == "grid")">Grid</option>
+                <option value="list" selected="@(viewMode == "list")">List</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+</div>
+
+@if (Model.Any())
+{
+    <div class="@(viewMode == "grid" ? "row g-4" : "list-group")">
+        @foreach (var product in Model)
+        {
+            var averageRating = product.Reviews.Any() ? product.Reviews.Average(r => r.Rating) : 0;
+            var reviewCount = product.Reviews.Count;
+            if (viewMode == "grid")
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product-card">
+                        @if (product.Featured)
+                        {
+                            <span class="badge-hot">Hot</span>
+                        }
+                        <a asp-action="ProductDetails" asp-route-id="@product.Id">
+                            <div class="product-image">
+                                @if (!string.IsNullOrEmpty(product.ImagePath))
+                                {
+                                    <img src="@product.ImagePath" alt="@product.Name" />
+                                }
+                                else
+                                {
+                                    <img src="/images/placeholder.jpg" alt="No image" />
+                                }
+                            </div>
+                        </a>
+                        <div class="product-info">
+                            <h3 class="product-name">@product.Name</h3>
+                            <div class="rating">
+                                <div class="stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= Math.Floor(averageRating))
+                                        {
+                                            <i class="fas fa-star"></i>
+                                        }
+                                        else if (i == Math.Ceiling(averageRating) && averageRating % 1 != 0)
+                                        {
+                                            <i class="fas fa-star-half-alt"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-star"></i>
+                                        }
+                                    }
+                                </div>
+                                <span class="review-count">(@reviewCount)</span>
+                            </div>
+                            <div class="price-container">
+                                <span class="current-price">$@product.Price.ToString("F2")</span>
+                                @if (product.OldPrice.HasValue)
+                                {
+                                    <span class="old-price">$@product.OldPrice.Value.ToString("F2")</span>
+                                }
+                            </div>
+                            @if (product.Stock > 0)
+                            {
+                                <div class="stock-info">
+                                    <span class="text-success">In Stock: @product.Stock items</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="stock-info">
+                                    <span class="text-danger">Out of Stock</span>
+                                </div>
+                            }
+                        </div>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form asp-action="AddToCart" method="post" class="add-to-cart-form">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <button type="submit" class="btn btn-primary btn-add-cart" @(product.Stock == 0 ? "disabled" : "")>
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="list-group-item mb-3 product-list-item">
+                    <div class="row g-3 align-items-start">
+                        <div class="col-md-3 col-sm-4 position-relative">
+                            @if (!string.IsNullOrEmpty(product.ImagePath))
+                            {
+                                <a asp-action="ProductDetails" asp-route-id="@product.Id">
+                                    <img src="@product.ImagePath" alt="@product.Name" class="list-image" />
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="ProductDetails" asp-route-id="@product.Id">
+                                    <img src="/images/placeholder.jpg" alt="No image" class="list-image" />
+                                </a>
+                            }
+                            @if (product.Featured)
+                            {
+                                <span class="badge-hot badge-list">Hot</span>
+                            }
+                        </div>
+                        <div class="col-md-6 col-sm-8">
+                            <h5 class="product-name">@product.Name</h5>
+                            <div class="product-meta">
+                                <span><strong>Category:</strong> @product.Category.Name</span> |
+                                <span><strong>Brand:</strong> @product.Brand.Name</span>
+                            </div>
+                            <div class="rating">
+                                <div class="stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= Math.Floor(averageRating))
+                                        {
+                                            <i class="fas fa-star"></i>
+                                        }
+                                        else if (i == Math.Ceiling(averageRating) && averageRating % 1 != 0)
+                                        {
+                                            <i class="fas fa-star-half-alt"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-star"></i>
+                                        }
+                                    }
+                                </div>
+                                <span class="review-count">(@reviewCount)</span>
+                            </div>
+                            <div class="price-container">
+                                <span class="current-price">$@product.Price.ToString("F2")</span>
+                                @if (product.OldPrice.HasValue)
+                                {
+                                    <span class="old-price">$@product.OldPrice.Value.ToString("F2")</span>
+                                }
+                            </div>
+                            @if (product.Stock > 0)
+                            {
+                                <div class="stock-info">
+                                    <span class="text-success">In Stock: @product.Stock items</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="stock-info">
+                                    <span class="text-danger">Out of Stock</span>
+                                </div>
+                            }
+                            <p class="product-description">@(string.IsNullOrEmpty(product.Description) ? "No description available." : product.Description.Length > 150 ? product.Description.Substring(0, 150) + "..." : product.Description)</p>
+                        </div>
+                        <div class="col-md-3 col-sm-12 product-actions">
+                            <div class="d-flex flex-column gap-2">
+                                <a asp-action="ProductDetails" asp-route-id="@product.Id" class="btn btn-outline-primary btn-sm">View Details</a>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <form asp-action="AddToCart" method="post" class="add-to-cart-form">
+                                        <input type="hidden" name="productId" value="@product.Id" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="btn btn-primary btn-sm" @(product.Stock == 0 ? "disabled" : "")>
+                                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <div class="pagination-container mt-4">
+        @Html.PagedListPager(Model, page => Url.Action("Products", new { page, searchString = ViewBag.SearchString, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, viewMode = viewMode }), 
+            new X.PagedList.Mvc.Core.Common.PagedListRenderOptions
+            {
+                UlElementClasses = new[] { "pagination", "custom-pagination" },
+                LiElementClasses = new[] { "page-item" },
+                LinkToPreviousPageFormat = "Previous",
+                LinkToNextPageFormat = "Next",
+                DisplayLinkToFirstPage = PagedListDisplayMode.IfNeeded,
+                DisplayLinkToLastPage = PagedListDisplayMode.IfNeeded,
+                MaximumPageNumbersToDisplay = 5
+            })
+    </div>
+}
+else
+{
+    <p class="text-center text-muted">No products found.</p>
+}

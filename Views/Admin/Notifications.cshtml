@@ -1,0 +1,39 @@
+@model IEnumerable<WebShop.Models.ProductChatMessage>
+@{
+    ViewData["Title"] = "Notifications";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Notifications</h2>
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>User</th>
+                <th>Message</th>
+                <th>Time</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var message in Model)
+            {
+                <tr>
+                    <td>@message.Product.Name</td>
+                    <td>@message.User.FullName</td>
+                    <td>@message.Message</td>
+                    <td>@message.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        <a asp-action="ReplyChatMessage" asp-route-productId="@message.ProductId" class="btn btn-sm btn-primary">Reply</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No messages found.</p>
+}

@@ -1,0 +1,55 @@
+@model WebShop.Models.Voucher
+@{
+    ViewData["Title"] = "Create Voucher";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Create Voucher</h2>
+<form asp-action="CreateVoucher" method="post" class="form-container">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Code" class="form-label">Voucher Code</label>
+                <input asp-for="Code" class="form-control" placeholder="Enter voucher code" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="DiscountPercentage" class="form-label">Discount Percentage</label>
+                <input asp-for="DiscountPercentage" class="form-control" type="number" min="0" max="100" placeholder="Enter discount percentage" />
+                <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="StartDate" class="form-label">Start Date</label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="EndDate" class="form-label">End Date</label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group form-check">
+                <input asp-for="IsActive" type="checkbox" class="form-check-input" id="IsActive" />
+                <label class="form-check-label" for="IsActive">Active</label>
+                <span asp-validation-for="IsActive" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Create Voucher</button>
+            <a asp-action="Vouchers" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

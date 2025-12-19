@@ -1,0 +1,39 @@
+@model WebShop.Controllers.ReplyChatMessageViewModel
+@{
+    ViewData["Title"] = "Reply to Chat";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Reply to Chat for @Model.ProductName</h2>
+<div class="list-group mb-3">
+    @if (Model.Messages.Any())
+    {
+        foreach (var message in Model.Messages)
+        {
+            <div class="list-group-item">
+                <p><strong>@(message.IsAdminReply ? "Admin" : message.User.FullName)</strong> (@message.CreatedAt.ToString("dd/MM/yyyy HH:mm"))</p>
+                <p>@message.Message</p>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No messages yet.</p>
+    }
+</div>
+<form asp-action="ReplyChatMessage" method="post">
+    <input type="hidden" asp-for="ProductId" />
+    <input type="hidden" asp-for="ProductName" />
+    <input type="hidden" asp-for="Messages" />
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="ReplyMessage"></label>
+        <textarea asp-for="ReplyMessage" class="form-control" required></textarea>
+        <span asp-validation-for="ReplyMessage" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Reply</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

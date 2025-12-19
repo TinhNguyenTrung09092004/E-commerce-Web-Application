@@ -1,0 +1,53 @@
+@model X.PagedList.IPagedList<WebShop.Models.Product>
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@{
+    ViewData["Title"] = "Manage Products";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Manage Products</h2>
+<a asp-action="CreateProduct" class="btn btn-primary mb-3">Create New Product</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Brand</th>
+            <th>Price</th>
+            <th>Old Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td><a asp-action="ProductDetails" asp-route-id="@product.Id">@product.Name</a></td>
+                <td>@product.Category.Name</td>
+                <td>@product.Brand.Name</td>
+                <td>@product.Price</td>
+                <td>@(product.OldPrice.HasValue ? product.OldPrice.ToString() : "N/A")</td>
+                <td>@product.Stock</td>
+                <td>
+                    <a asp-action="EditProduct" asp-route-id="@product.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="DeleteProduct" asp-route-id="@product.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="mt-3">
+    @Html.PagedListPager(Model, page => Url.Action("Products", new { page }), new PagedListRenderOptionsBase
+    {
+        UlElementClasses = new[] { "pagination", "custom-pagination" },
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" },
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 5
+    })
+</div>

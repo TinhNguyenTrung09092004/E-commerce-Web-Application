@@ -1,0 +1,32 @@
+@model IEnumerable<WebShop.Models.Brand>
+@{
+    ViewData["Title"] = "Manage Brands";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Manage Brands</h2>
+<a asp-action="CreateBrand" class="btn btn-primary mb-3">Create New Brand</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th style="width: 7%;">Name</th>
+            <th style="width: 79%;">Description</th>
+            <th style="width: 14%;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var brand in Model)
+        {
+            <tr style="vertical-align: middle;">
+                <td>@brand.Name</td>
+                <td>@brand.Description</td>
+                <td>
+                    <a asp-action="EditBrand" asp-route-id="@brand.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="DeleteBrand" asp-route-id="@brand.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

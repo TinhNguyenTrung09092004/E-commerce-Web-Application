@@ -1,0 +1,184 @@
+@model WebShop.Controllers.ProductDetailsViewModel
+@{
+    ViewData["Title"] = "Product Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="product-details-section">
+    <h2 class="section-title">@Model.Product.Name</h2>
+    <div class="product-card mb-5">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="product-image pt-3">
+                    @if (!string.IsNullOrEmpty(Model.Product.ImagePath))
+                    {
+                        <img src="@Model.Product.ImagePath" alt="@Model.Product.Name" class="img-fluid" />
+                    }
+                    else
+                    {
+                        <img src="/images/placeholder.jpg" alt="No image" class="img-fluid" />
+                    }
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="product-info pt-3">
+                    <p class="product-meta"><strong>Category:</strong> @Model.Product.Category.Name</p>
+                    <p class="product-meta"><strong>Brand:</strong> @Model.Product.Brand.Name</p>
+                    <div class="price-container">
+                        <span class="current-price">$@Model.Product.Price.ToString("F2")</span>
+                        @if (Model.Product.OldPrice.HasValue)
+                        {
+                            <span class="old-price">$@Model.Product.OldPrice.Value.ToString("F2")</span>
+                        }
+                    </div>
+                    @if (Model.Product.Stock > 0)
+                    {
+                        <div class="stock-info">
+                            <span class="text-success">In Stock: @Model.Product.Stock items</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="stock-info">
+                            <span class="text-danger">Out of Stock</span>
+                        </div>
+                    }
+                    <div class="rating">
+                        <div class="stars">
+                            @{
+                                var averageRating = Model.Product.Reviews.Any() ? Model.Product.Reviews.Average(r => r.Rating) : 0;
+                                var reviewCount = Model.Product.Reviews.Count;
+                            }
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= Math.Floor(averageRating))
+                                {
+                                    <i class="fas fa-star"></i>
+                                }
+                                else if (i == Math.Ceiling(averageRating) && averageRating % 1 != 0)
+                                {
+                                    <i class="fas fa-star-half-alt"></i>
+                                }
+                                else
+                                {
+                                    <i class="far fa-star"></i>
+                                }
+                            }
+                        </div>
+                        <span class="review-count">(@reviewCount)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="product-description pt-3">
+                    <h5>Description</h5>
+                    <p>@(string.IsNullOrEmpty(Model.Product.Description) ? "No description available." : Model.Product.Description)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="product-actions mb-5 d-flex justify-content-between">
+        <a href="@Url.Action("Products", "Home")" class="btn btn-outline-primary btn-rounded">Back</a>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <form asp-action="AddToCart" method="post" class="add-to-cart-form">
+                <input type="hidden" name="productId" value="@Model.Product.Id" />
+                <input type="hidden" name="quantity" value="1" />
+                <button type="submit" class="btn btn-primary btn-add-cart" @(Model.Product.Stock == 0 ? "disabled" : "")>
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+            </form>
+        }
+    </div>
+
+    <h3 class="section-title">Reviews</h3>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="form-container mb-4">
+            <form asp-action="AddReview" method="post">
+                <input type="hidden" name="productId" value="@Model.Product.Id" />
+                <div class="form-group">
+                    <label for="comment" class="form-label">Comment</label>
+                    <textarea name="comment" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="rating" class="form-label">Rating</label>
+                    <select name="rating" class="form-control" required>
+                        <option value="1">1 Star</option>
+                        <option value="2">2 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="5">5 Stars</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-rounded">Submit Review</button>
+            </form>
+        </div>
+    }
+    @if (Model.Reviews.Any())
+    {
+        <div class="list-group">
+            @foreach (var review in Model.Reviews)
+            {
+                <div class="list-group-item product-list-item mb-3">
+                    <div class="rating">
+                        <div class="stars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= review.Rating)
+                                {
+                                    <i class="fas fa-star"></i>
+                                }
+                                else
+                                {
+                                    <i class="far fa-star"></i>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <p class="product-meta"><strong>@review.User.FullName</strong> (@review.CreatedAt.ToString("dd/MM/yyyy"))</p>
+                    <p>@review.Comment</p>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">No reviews yet.</p>
+    }
+
+    <h3 class="section-title">Chat</h3>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="form-container mb-4">
+            <form asp-action="SendChatMessage" method="post">
+                <input type="hidden" name="productId" value="@Model.Product.Id" />
+                <div class="form-group">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea name="message" class="form-control" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-rounded">Send Message</button>
+            </form>
+        </div>
+    }
+    <div class="list-group">
+        @if (Model.ChatMessages.Any())
+        {
+            foreach (var message in Model.ChatMessages)
+            {
+                <div class="list-group-item product-list-item mb-3">
+                    <p class="product-meta"><strong>@(message.IsAdminReply ? "Admin" : message.User.FullName)</strong> (@message.CreatedAt.ToString("dd/MM/yyyy HH:mm"))</p>
+                    <p>@message.Message</p>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted">No messages yet.</p>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

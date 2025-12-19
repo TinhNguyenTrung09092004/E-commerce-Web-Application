@@ -1,0 +1,32 @@
+@model IEnumerable<WebShop.Models.Banner>
+@{
+    ViewData["Title"] = "Manage Banners";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Manage Banners</h2>
+<a asp-action="CreateBanner" class="btn btn-primary mb-3">Create New Banner</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var banner in Model)
+        {
+            <tr>
+                <td>
+                    <img src="@banner.ImagePath" alt="Banner" style="max-width: 100px;" />
+                </td>
+                <td style="vertical-align: middle;">
+                    <a asp-action="EditBanner" asp-route-id="@banner.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="DeleteBanner" asp-route-id="@banner.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

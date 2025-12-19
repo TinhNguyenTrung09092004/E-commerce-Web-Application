@@ -1,0 +1,38 @@
+@model IEnumerable<WebShop.Models.Voucher>
+@{
+    ViewData["Title"] = "Manage Vouchers";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Manage Vouchers</h2>
+<a asp-action="CreateVoucher" class="btn btn-primary mb-3">Create New Voucher</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Discount Percentage</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var voucher in Model)
+        {
+            <tr>
+                <td>@voucher.Code</td>
+                <td>@voucher.DiscountPercentage%</td>
+                <td>@voucher.StartDate.ToString("dd/MM/yyyy")</td>
+                <td>@voucher.EndDate.ToString("dd/MM/yyyy")</td>
+                <td>@(voucher.IsActive ? "Yes" : "No")</td>
+                <td>
+                    <a asp-action="EditVoucher" asp-route-id="@voucher.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="DeleteVoucher" asp-route-id="@voucher.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

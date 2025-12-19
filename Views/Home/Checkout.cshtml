@@ -1,0 +1,70 @@
+@model WebShop.Controllers.CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Checkout</h2>
+<form asp-action="Checkout" method="get">
+    <div class="mb-3">
+        <label for="voucherCode" class="form-label">Voucher Code</label>
+        <input type="text" name="voucherCode" class="form-control" value="@Model.VoucherCode" />
+        <button type="submit" class="btn btn-primary mt-2">Apply Voucher</button>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.VoucherMessage))
+    {
+        <p class="text-@(Model.VoucherMessage.Contains("Invalid") ? "danger" : "success")">@Model.VoucherMessage</p>
+    }
+</form>
+<form asp-action="PlaceOrder" method="post">
+    <input type="hidden" name="voucherCode" value="@Model.VoucherCode" />
+    <div class="mb-3">
+        <label for="shippingAddress" class="form-label">Shipping Address</label>
+        <input type="text" name="shippingAddress" class="form-control" value="@Model.ShippingAddress" required />
+    </div>
+    <h4>Order Summary</h4>
+    @if (Model.CartItems.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.CartItems)
+                {
+                    <tr>
+                        <td>@item.Product.Name</td>
+                        <td>@item.Price</td>
+                        <td>@item.Quantity</td>
+                        <td>@(item.Price * item.Quantity)</td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="3" class="text-end"><strong>Subtotal</strong></td>
+                    <td><strong>@Model.Subtotal</strong></td>
+                </tr>
+                @if (Model.Discount > 0)
+                {
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Discount</strong></td>
+                        <td><strong>-@Model.Discount</strong></td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="3" class="text-end"><strong>Total</strong></td>
+                    <td><strong>@Model.Total</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Place Order</button>
+    }
+    else
+    {
+        <p>Your cart is empty.</p>
+    }
+</form>

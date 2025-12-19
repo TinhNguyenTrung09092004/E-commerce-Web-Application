@@ -1,0 +1,50 @@
+@model WebShop.Models.UpdateProfileViewModel
+
+<section class="update-profile-section">
+    <h2 class="section-title">Update Profile</h2>
+
+    <div class="form-container">
+        <form asp-action="UpdateProfile" method="post">
+            <div asp-validation-summary="All" class="text-danger mb-4"></div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="FullName" class="form-label">Full Name</label>
+                        <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Address" class="form-label">Address</label>
+                        <textarea asp-for="Address" class="form-control" rows="4" placeholder="Enter address"></textarea>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-actions d-flex justify-content-between">
+                        <a href="@Url.Action("Dashboard", "User")" class="btn btn-outline-primary btn-rounded">Back to Dashboard</a>
+                        <button type="submit" class="btn btn-primary btn-rounded">Update Profile</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

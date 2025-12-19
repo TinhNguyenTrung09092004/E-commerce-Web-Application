@@ -1,0 +1,46 @@
+@model IEnumerable<WebShop.Models.Order>
+@{
+    ViewData["Title"] = "Manage Orders";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Manage Orders</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>User</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Payment Status</th>
+            <th>Shipping Address</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td><a asp-action="OrderDetails" asp-route-id="@order.Id">@order.Id</a></td>
+                <td><a asp-action="UserDetails" asp-route-id="@order.UserId">@order.User.FullName</a></td>
+                <td>@(Math.Max(0, order.Subtotal - order.Discount))</td>
+                <td>@order.Status</td>
+                <td>@order.PaymentStatus</td>
+                <td>@order.ShippingAddress</td>
+                <td>
+                    @if (order.Status != "Canceled" && order.Status != "Delivered")
+                    {
+                        <form asp-action="UpdateOrderStatus" asp-route-id="@order.Id" method="post" style="display:inline;">
+                            <select name="status" class="form-control d-inline-block w-auto">
+                                <option value="Shipped">Shipped</option>
+                                <option value="Canceled">Canceled</option>
+                                <option value="Delivered">Delivered</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,35 @@
+@model WebShop.Models.Brand
+@{
+    ViewData["Title"] = "Edit Brand";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Edit Brand</h2>
+<form asp-action="EditBrand" method="post" class="form-container">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Name" class="form-label">Brand Name</label>
+                <input asp-for="Name" class="form-control" placeholder="Enter brand name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <label asp-for="Description" class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="5" placeholder="Enter brand description"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a asp-action="Brands" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

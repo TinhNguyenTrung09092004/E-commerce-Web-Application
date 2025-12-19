@@ -1,0 +1,34 @@
+@model WebShop.Models.ApplicationUser
+@{
+    ViewData["Title"] = "User Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>User Details</h2>
+<div class="card">
+    <div class="card-body">
+        <p><strong>Full Name:</strong> @Model.FullName</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Phone Number:</strong> @Model.PhoneNumber</p>
+        <p><strong>Address:</strong> @Model.Address</p>
+        <p><strong>Status:</strong> @(Model.LockoutEnd == null || Model.LockoutEnd < DateTimeOffset.Now ? "Active" : "Locked")</p>
+        <div>
+            @if (Model.Id != User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+            {
+                @if (Model.LockoutEnd == null || Model.LockoutEnd < DateTimeOffset.Now)
+                {
+                    <form asp-action="LockUser" asp-route-id="@Model.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to lock this user?')">Lock User</button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="UnlockUser" asp-route-id="@Model.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to unlock this user?')">Unlock User</button>
+                    </form>
+                }
+            }
+        </div>
+    </div>
+</div>
+<a asp-action="Users" class="btn btn-primary mt-3">Back to Users</a>

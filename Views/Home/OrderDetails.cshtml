@@ -1,0 +1,61 @@
+@model WebShop.Models.Order
+@{
+    ViewData["Title"] = "Order Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Order Details</h2>
+<div class="card">
+    <div class="card-header">
+        Order #@Model.Id - @Model.OrderDate.ToString("dd/MM/yyyy")
+    </div>
+    <div class="card-body">
+        <p><strong>Status:</strong> @Model.Status</p>
+        <p><strong>Payment Status:</strong> @Model.PaymentStatus</p>
+        <p><strong>Shipping Address:</strong> @Model.ShippingAddress</p>
+        @if (!string.IsNullOrEmpty(Model.VoucherCode) && ViewBag.Voucher != null)
+        {
+            <p><strong>Voucher Code:</strong> @Model.VoucherCode</p>
+            <p><strong>Discount:</strong> @ViewBag.Voucher.DiscountPercentage%</p>
+        }
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.ProductName</td>
+                        <td>@item.Price</td>
+                        <td>@item.Quantity</td>
+                        <td>@(item.Price * item.Quantity)</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end"><strong>Subtotal</strong></td>
+                    <td><strong>@Model.Subtotal</strong></td>
+                </tr>
+                @if (Model.Discount > 0)
+                {
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Discount</strong></td>
+                        <td><strong>-@Model.Discount</strong></td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="3" class="text-end"><strong>Total</strong></td>
+                    <td><strong>@(Math.Max(0, Model.Subtotal - Model.Discount))</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<a asp-action="Orders" class="btn btn-primary mt-3">Back to Orders</a>

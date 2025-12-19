@@ -1,0 +1,43 @@
+@model IEnumerable<WebShop.Models.Category>
+@{
+    ViewData["Title"] = "Manage Categories";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Manage Categories</h2>
+<a asp-action="CreateCategory" class="btn btn-primary mb-3">Create New Category</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th style="width: 7%;">Name</th>
+            <th  style="width: 69%;">Description</th>
+            <th style="width: 12%;">Image</th>
+            <th style="width: 12%;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr style="vertical-align: middle;">
+                <td>@category.Name</td>
+                <td>@category.Description</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(category.ImagePath))
+                    {
+                        <img src="@category.ImagePath" alt="@category.Name" style="max-width: 100px;" />
+                    }
+                    else
+                    {
+                        <span>No Image</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="EditCategory" asp-route-id="@category.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="DeleteCategory" asp-route-id="@category.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

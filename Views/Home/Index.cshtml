@@ -1,0 +1,291 @@
+﻿@model WebShop.Models.HomeIndexViewModel
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="bannerCarousel" class="carousel slide banner-carousel" data-bs-ride="carousel" data-bs-interval="5000">
+    <div class="carousel-inner">
+        @if (Model.Banners.Any())
+        {
+            var first = true;
+            foreach (var banner in Model.Banners)
+            {
+                <div class="carousel-item @(first ? "active" : "")">
+                    <img src="@banner.ImagePath" class="d-block w-100" alt="Banner" />
+                </div>
+                first = false;
+            }
+        }
+        else
+        {
+            <div class="carousel-item active">
+                <img src="/images/default-banner.jpg" class="d-block w-100" alt="Default Banner" />
+                <div class="carousel-caption">
+                    <h2>Welcome to WebShop</h2>
+                    <p>Discover the latest electronics</p>
+                    <a asp-controller="Home" asp-action="Products" class="btn btn-primary btn-rounded">Explore</a>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="carousel-indicators">
+        @for (int i = 0; i < (Model.Banners.Any() ? Model.Banners.Count : 1); i++)
+        {
+            <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "false")" aria-label="Slide @(i+1)"></button>
+        }
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<section class="special-offers">
+    <div class="container">
+        <h2 class="section-title">Special Offers</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="offer-card">
+                    <i class="fas fa-shipping-fast"></i>
+                    <h3>Free Shipping</h3>
+                    <p>For orders over $50</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="offer-card">
+                    <i class="fas fa-undo"></i>
+                    <h3>Easy Returns</h3>
+                    <p>Within 7 days</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="offer-card">
+                    <i class="fas fa-lock"></i>
+                    <h3>Secure Payment</h3>
+                    <p>100% secure</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="offer-card">
+                    <i class="fas fa-headset"></i>
+                    <h3>24/7 Support</h3>
+                    <p>Always ready to help</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="featured-products">
+    <div class="container">
+        <h2 class="section-title">Featured Products</h2>
+        <div class="row g-4">
+            @foreach (var product in Model.FeaturedProducts)
+            {
+                var averageRating = product.Reviews.Any() ? product.Reviews.Average(r => r.Rating) : 0;
+                var reviewCount = product.Reviews.Count;
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product-card">
+                        <span class="badge-hot">Hot</span>
+                        <a asp-controller="Home" asp-action="ProductDetails" asp-route-id="@product.Id">
+                            <div class="product-image">
+                                @if (!string.IsNullOrEmpty(product.ImagePath))
+                                {
+                                    <img src="@product.ImagePath" alt="@product.Name" />
+                                }
+                                else
+                                {
+                                    <img src="/images/placeholder.jpg" alt="No image" />
+                                }
+                            </div>
+                        </a>
+                        <div class="product-info">
+                            <h3 class="product-name">@product.Name</h3>
+                            <div class="rating">
+                                <div class="stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= Math.Floor(averageRating))
+                                        {
+                                            <i class="fas fa-star"></i>
+                                        }
+                                        else if (i == Math.Ceiling(averageRating) && averageRating % 1 != 0)
+                                        {
+                                            <i class="fas fa-star-half-alt"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-star"></i>
+                                        }
+                                    }
+                                </div>
+                                <span class="review-count">(@reviewCount)</span>
+                            </div>
+                            <div class="price-container">
+                                <span class="current-price">$@product.Price.ToString("F2")</span>
+                                @if (product.OldPrice.HasValue)
+                                {
+                                    <span class="old-price">$@product.OldPrice.Value.ToString("F2")</span>
+                                }
+                            </div>
+                            @if (product.Stock > 0)
+                            {
+                                <div class="stock-info">
+                                    <span class="text-success">In Stock: @product.Stock items</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="stock-info">
+                                    <span class="text-danger">Out of Stock</span>
+                                </div>
+                            }
+                        </div>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form asp-action="AddToCart" method="post" class="add-to-cart-form">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <button type="submit" class="btn btn-primary btn-add-cart" @(product.Stock == 0 ? "disabled" : "")>
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                            </form>                                
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="text-center mt-4">
+            <a asp-controller="Home" asp-action="Products" class="btn btn-primary btn-rounded">View All Products →</a>
+        </div>
+    </div>
+</section>
+
+
+<section class="product-categories">
+    <div class="container">
+        <h2 class="section-title">Product Categories</h2>
+        <div class="row g-4">
+            @foreach (var category in Model.Categories)
+            {
+                <div class="col-md-4">
+                    <div class="category-card">
+                        @if (!string.IsNullOrEmpty(category.ImagePath))
+                        {
+                            <img src="@category.ImagePath" alt="@category.Name" />
+                        }
+                        else
+                        {
+                            <img src="/images/placeholder.jpg" alt="No image" />
+                        }
+                        <div class="category-info">
+                            <h3>@category.Name</h3>
+                            <p>@category.Description</p>
+                            <a asp-controller="Home" asp-action="Products" class="btn btn-primary btn-sm">Explore Now</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="new-products">
+    <div class="container">
+        <h2 class="section-title">New Products</h2>
+        <div class="row g-4">
+            @foreach (var product in Model.NewProducts)
+            {
+                var averageRating = product.Reviews.Any() ? product.Reviews.Average(r => r.Rating) : 0;
+                var reviewCount = product.Reviews.Count;
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product-card">
+                        <span class="badge-new">New</span>
+                        <a asp-controller="Home" asp-action="ProductDetails" asp-route-id="@product.Id">
+                            <div class="product-image">
+                                @if (!string.IsNullOrEmpty(product.ImagePath))
+                                {
+                                    <img src="@product.ImagePath" alt="@product.Name" />
+                                }
+                                else
+                                {
+                                    <img src="/images/placeholder.jpg" alt="No image" />
+                                }
+                            </div>
+                        </a>
+                        <div class="product-info">
+                            <h3 class="product-name">@product.Name</h3>
+                            <div class="rating">
+                                <div class="stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= Math.Floor(averageRating))
+                                        {
+                                            <i class="fas fa-star"></i>
+                                        }
+                                        else if (i == Math.Ceiling(averageRating) && averageRating % 1 != 0)
+                                        {
+                                            <i class="fas fa-star-half-alt"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-star"></i>
+                                        }
+                                    }
+                                </div>
+                                <span class="review-count">(@reviewCount)</span>
+                            </div>
+                            <div class="price-container">
+                                <span class="current-price">$@product.Price.ToString("F2")</span>
+                                @if (product.OldPrice.HasValue)
+                                {
+                                    <span class="old-price">$@product.OldPrice.Value.ToString("F2")</span>
+                                }
+                            </div>
+                            @if (product.Stock > 0)
+                            {
+                                <div class="stock-info">
+                                    <span class="text-success">In Stock: @product.Stock items</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="stock-info">
+                                    <span class="text-danger">Out of Stock</span>
+                                </div>
+                            }
+                        </div>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form asp-action="AddToCart" method="post" class="add-to-cart-form">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <button type="submit" class="btn btn-primary btn-add-cart" @(product.Stock == 0 ? "disabled" : "")>
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const carousel = document.querySelector('#bannerCarousel');
+            const bsCarousel = new bootstrap.Carousel(carousel, {
+                interval: 5000,
+                wrap: true,
+                touch: true
+            });
+        });
+    </script>
+}

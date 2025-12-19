@@ -1,0 +1,57 @@
+@model IEnumerable<WebShop.Models.CartItem>
+@{
+    ViewData["Title"] = "Cart";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Your Cart</h2>
+<a asp-action="Products" class="btn btn-secondary mb-3">Back to Products</a>
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Price</td>
+                    <td>
+                        <form asp-action="UpdateCartItem" method="post" style="display:inline;">
+                            <input type="hidden" name="cartItemId" value="@item.Id" />
+                            <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control d-inline-block w-auto" />
+                            <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                        </form>
+                    </td>
+                    <td>@(item.Price * item.Quantity)</td>
+                    <td>
+                        <form asp-action="RemoveCartItem" method="post" style="display:inline;">
+                            <input type="hidden" name="cartItemId" value="@item.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Total</strong></td>
+                <td><strong>@Model.Sum(item => item.Price * item.Quantity)</strong></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+    <a asp-action="Checkout" class="btn btn-primary">Proceed to Checkout</a>
+}
+else
+{
+    <p>Your cart is empty.</p>
+}

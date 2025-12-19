@@ -1,0 +1,40 @@
+@model WebShop.Models.Category
+@{
+    ViewData["Title"] = "Create Category";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Create Category</h2>
+<form asp-action="CreateCategory" method="post" enctype="multipart/form-data" class="form-container">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Name" class="form-label">Category Name</label>
+                <input asp-for="Name" class="form-control" placeholder="Enter category name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="imageFile" class="form-label">Category Image</label>
+                <input type="file" name="imageFile" class="form-control" accept=".jpg,.jpeg,.png,.gif" />
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <label asp-for="Description" class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="5" placeholder="Enter category description"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Create Category</button>
+            <a asp-action="Categories" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
